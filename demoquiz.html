@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo Quiz</title>
+  <link rel="stylesheet" href="app.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div id="preloader"></div>
+
+  <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">
+        <img src="autism.png" class="Image">
+        Import Quiz
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="collapsibleNavbar">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="signup.html">Sign Up</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="Login.html">Sign In</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="Text">
+      Let's Take a Demo Quiz Test
+      <hr>
+    </div>
+
+    <div id="question-container" class="hide">
+      <div class="question-text"></div>
+      <div id="answer-buttons" class="answer-buttons"></div>
+      <button type="button" id="next-btn" class="next-btn1 btn1 hide">Next</button>
+    </div>
+
+    <div class="controls">
+      <button type="button" id="start-btn" class="start-btn1 btn1">Start</button>
+      <button type="button" id="submit-btn" class="submit-btn1 btn1 hide">Submit</button>
+    </div>
+    <hr>
+  </div>
+
+  <div class="score">
+    <span id="right-answers"></span>
+    <div class="score-container"></div>
+
+    <script>
+      var loader = document.getElementById("preloader");
+      window.addEventListener("load", function () {
+        loader.style.display = "none";
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const startButton = document.getElementById("start-btn");
+        const nextButton = document.getElementById("next-btn");
+        const submitButton = document.getElementById("submit-btn");
+        const questionContainer = document.getElementById("question-container");
+        const scoreContainer = document.querySelector(".score-container");
+        const rightAnswers = document.getElementById("right-answers");
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const questions = [
+  {
+    question: "What does HTML stand for?",
+    answers: [
+      { text: "Hyper Text Markup Language", correct: true },
+      { text: "Highly Typed Markdown Language", correct: false },
+      { text: "Hyperlink and Text Markup Language", correct: false },
+      { text: "Home Tool Markup Language", correct: false },
+    ],
+  },
+  {
+    question: "Which of the following is a CSS preprocessor?",
+    answers: [
+      { text: "JavaScript", correct: false },
+      { text: "TypeScript", correct: false },
+      { text: "Sass", correct: true },
+      { text: "JSON", correct: false },
+    ],
+  },
+  {
+    question: "What is the purpose of the JavaScript 'strict mode'?",
+    answers: [
+      { text: "To increase performance", correct: false },
+      { text: "To catch common coding errors and prevent the use of potentially problematic features", correct: true },
+      { text: "To enable asynchronous programming", correct: false },
+      { text: "To make the code more readable", correct: false },
+    ],
+  },
+  {
+    question: "What is the purpose of the 'viewport' meta tag in HTML?",
+    answers: [
+      { text: "To set the background color of the webpage", correct: false },
+      { text: "To define the character set for the document", correct: false },
+      { text: "To specify the author of the webpage", correct: false },
+      { text: "To control the viewport's width and scaling on different devices", correct: true },
+    ],
+  },
+  {
+    question: "What does API stand for in web development?",
+    answers: [
+      { text: "Application Programming Interface", correct: true },
+      { text: "Advanced Programming Interface", correct: false },
+      { text: "Automated Programming Interface", correct: false },
+      { text: "Application Process Integration", correct: false },
+    ],
+  },
+  {
+    question: "Which HTTP status code represents 'Not Found'?",
+    answers: [
+      { text: "200 OK", correct: false },
+      { text: "404 Not Found", correct: true },
+      { text: "500 Internal Server Error", correct: false },
+      { text: "302 Found", correct: false },
+    ],
+  },
+  {
+    question: "What is the purpose of the 'alt' attribute in the HTML 'img' tag?",
+    answers: [
+      { text: "To provide a title for the image", correct: false },
+      { text: "To define the size of the image", correct: false },
+      { text: "To specify the alignment of the image", correct: false },
+      { text: "To provide alternative text for browsers that cannot display the image", correct: true },
+    ],
+  },
+  {
+    question: "In CSS, what property is used to control the spacing between lines of text?",
+    answers: [
+      { text: "margin", correct: false },
+      { text: "padding", correct: false },
+      { text: "line-height", correct: true },
+      { text: "letter-spacing", correct: false },
+    ],
+  },
+  {
+    question: "What is the purpose of the 'localStorage' object in JavaScript?",
+    answers: [
+      { text: "To store data in cookies", correct: false },
+      { text: "To create local variables", correct: false },
+      { text: "To store key-value pairs locally in the user's browser", correct: true },
+      { text: "To handle session-based storage", correct: false },
+    ],
+  },
+  {
+    question: "Which of the following is a front-end JavaScript framework?",
+    answers: [
+      { text: "Express.js", correct: false },
+      { text: "Angular.js", correct: true },
+      { text: "Node.js", correct: false },
+      { text: "Django", correct: false },
+    ],
+  },
+  {
+    question: "What is the purpose of the 'box-sizing' property in CSS?",
+    answers: [
+      { text: "To set the background color of an element", correct: false },
+      { text: "To control the visibility of an element", correct: false },
+      { text: "To specify whether an element's padding and border should be included in its total width and height", correct: true },
+      { text: "To apply a shadow effect to an element", correct: false },
+    ],
+  },
+  {
+    question: "What does the term 'responsive design' refer to in web development?",
+    answers: [
+      { text: "The ability of a website to handle server errors gracefully", correct: false },
+      { text: "The use of server-side languages for web development", correct: false },
+      { text: "The process of designing web pages to adapt to different screen sizes and devices", correct: true },
+      { text: "The implementation of secure authentication mechanisms", correct: false },
+    ],
+  },
+  {
+    question: "Which of the following is not a valid JavaScript data type?",
+    answers: [
+      { text: "string", correct: false },
+      { text: "boolean", correct: false },
+      { text: "integer", correct: true },
+      { text: "object", correct: false },
+    ],
+  },
+  {
+    question: "What does the acronym 'URL' stand for?",
+    answers: [
+      { text: "Uniform Resource Locator", correct: true },
+      { text: "Universal Record Locator", correct: false },
+      { text: "User Registry Language", correct: false },
+      { text: "User Requested Link", correct: false },
+    ],
+  },
+  {
+    question: "In JavaScript, what is the purpose of the 'addEventListener' method?",
+    answers: [
+      { text: "To create new elements in the DOM", correct: false },
+      { text: "To remove event listeners from elements", correct: false },
+      { text: "To attach an event handler function to an element", correct: true },
+      { text: "To change the styling of elements dynamically", correct: false },
+    ],
+  },
+  {
+    question: "What is the role of the 'DOCTYPE' declaration in an HTML document?",
+    answers: [
+      { text: "To define the document type and version of HTML in use", correct: true },
+      { text: "To declare a new custom HTML tag", correct: false },
+      { text: "To specify the document's primary language", correct: false },
+      { text: "To define the document's encoding format", correct: false },
+    ],
+  },
+  {
+    question: "What is the purpose of the 'npm' command in Node.js?",
+    answers: [
+      { text: "To install and manage Node.js modules and packages", correct: true },
+      { text: "To create a new Node.js project", correct: false },
+      { text: "To execute a Node.js script", correct: false },
+      { text: "To uninstall Node.js from the system", correct: false },
+    ],
+  },
+  {
+    question: "What is the purpose of the 'SQL' language in web development?",
+    answers: [
+      { text: "To style web pages and create responsive designs", correct: false },
+      { text: "To handle asynchronous operations in JavaScript", correct: false },
+      { text: "To query and manipulate databases", correct: true },
+      { text: "To define the structure of an HTML document", correct: false },
+    ],
+  },
+  {
+    question: "Which of the following is a version control system commonly used in web development?",
+    answers: [
+      { text: "Git", correct: true },
+      { text: "Python", correct: false },
+      { text: "Ruby", correct: false },
+      { text: "Java", correct: false },
+    ],
+  },
+
+
+          
+          // Add more questions as needed
+        ];
+
+        startButton.addEventListener("click", startQuiz);
+        nextButton.addEventListener("click", setNextQuestion);
+        submitButton.addEventListener("click", showFinalScore);
+
+        function startQuiz() {
+          startButton.classList.add("hide");
+          questionContainer.classList.remove("hide");
+          setNextQuestion();
+        }
+
+        function setNextQuestion() {
+          resetState();
+          if (currentQuestionIndex < questions.length) {
+            showQuestion(questions[currentQuestionIndex]);
+            currentQuestionIndex++;
+            if (currentQuestionIndex === questions.length) {
+              nextButton.classList.add("hide");
+              submitButton.classList.remove("hide");
+            }
+          }
+        }
+
+        function showQuestion(question) {
+          const questionText = document.querySelector(".question-text");
+          const answerButtons = document.getElementById("answer-buttons");
+
+          questionText.innerText = question.question;
+
+          question.answers.forEach((answer) => {
+            const button = document.createElement("button");
+            button.classList.add("btn1");
+            button.innerText = answer.text;
+            button.addEventListener("click", () => selectAnswer(answer, question));
+            answerButtons.appendChild(button);
+          });
+        }
+
+        function resetState() {
+          clearStatusClass(document.body);
+          nextButton.classList.add("hide");
+          submitButton.classList.add("hide");
+          const answerButtons = document.getElementById("answer-buttons");
+          while (answerButtons.firstChild) {
+            answerButtons.removeChild(answerButtons.firstChild);
+          }
+        }
+
+        function selectAnswer(answer, question) {
+          const isCorrect = answer.correct;
+          if (isCorrect) {
+            score++;
+          }
+          nextButton.classList.remove("hide");
+        }
+
+        function showFinalScore() {
+          questionContainer.classList.add("hide");
+          scoreContainer.classList.remove("hide");
+          rightAnswers.innerText = `Your score: ${score} out of ${questions.length}`;
+
+          // Display a message based on the score
+          let message = "";
+          if (score === questions.length) {
+            message = "Congratulations! You got all the answers right!";
+          } else if (score >= Math.floor(questions.length / 2)) {
+            message = "Well done! You did a good job!";
+          } else {
+            message = "Keep practicing. You can do better!";
+          }
+
+          const scoreMessage = document.createElement("div");
+          scoreMessage.classList.add("score-message");
+          scoreMessage.innerText = message;
+          scoreContainer.appendChild(scoreMessage);
+        }
+
+        function clearStatusClass(element) {
+          element.classList.remove("correct");
+          element.classList.remove("wrong");
+        }
+      });
+    </script>
+  </div>
+</body>
+</html>
