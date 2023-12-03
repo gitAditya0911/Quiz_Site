@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,15 @@
   <link rel="stylesheet" href="app.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .correct::after {
+      content: '\2714';
+      color: green;
+      margin-left: 10px;
+    }
+  </style>
 </head>
+
 <body>
   <div id="preloader"></div>
 
@@ -58,26 +67,30 @@
   <div class="score">
     <span id="right-answers"></span>
     <div class="score-container"></div>
+  </div>
 
-    <script>
-      var loader = document.getElementById("preloader");
-      window.addEventListener("load", function () {
-        loader.style.display = "none";
-      });
+  <script>
+    var loader = document.getElementById("preloader");
+    window.addEventListener("load", function () {
+      loader.style.display = "none";
+    });
 
-      document.addEventListener("DOMContentLoaded", function () {
-        const startButton = document.getElementById("start-btn");
-        const nextButton = document.getElementById("next-btn");
-        const submitButton = document.getElementById("submit-btn");
-        const questionContainer = document.getElementById("question-container");
-        const scoreContainer = document.querySelector(".score-container");
-        const rightAnswers = document.getElementById("right-answers");
+    document.addEventListener("DOMContentLoaded", function () {
+      const startButton = document.getElementById("start-btn");
+      const nextButton = document.getElementById("next-btn");
+      const submitButton = document.getElementById("submit-btn");
+      const questionContainer = document.getElementById("question-container");
+      const scoreContainer = document.querySelector(".score-container");
+      const rightAnswers = document.getElementById("right-answers");
 
-        let currentQuestionIndex = 0;
-        let score = 0;
+      let currentQuestionIndex = 0;
+      let score = 0;
+      let timer;
 
-        const questions = [
-  {
+      const questions = [
+        // Questions array here...
+
+        {
     question: "What does HTML stand for?",
     answers: [
       { text: "Hyper Text Markup Language", correct: true },
@@ -138,6 +151,15 @@
       { text: "To define the size of the image", correct: false },
       { text: "To specify the alignment of the image", correct: false },
       { text: "To provide alternative text for browsers that cannot display the image", correct: true },
+    ],
+  },
+  {
+    question: "Which is a css framework ?",
+    answers: [
+      { text: "Tailwind", correct: true },
+      { text: "node.js", correct: false },
+      { text: "Oracle", correct: false },
+      { text: "Kotlin", correct: false },
     ],
   },
   {
@@ -249,93 +271,120 @@
     ],
   },
 
+        // ... other questions ...
+      ];
 
-          
-          // Add more questions as needed
-        ];
+      startButton.addEventListener("click", startQuiz);
+      nextButton.addEventListener("click", setNextQuestion);
+      submitButton.addEventListener("click", showFinalScore);
 
-        startButton.addEventListener("click", startQuiz);
-        nextButton.addEventListener("click", setNextQuestion);
-        submitButton.addEventListener("click", showFinalScore);
+      function startQuiz() {
+        startButton.classList.add("hide");
+        questionContainer.classList.remove("hide");
+        setNextQuestion();
+      }
 
-        function startQuiz() {
-          startButton.classList.add("hide");
-          questionContainer.classList.remove("hide");
+      function setNextQuestion() {
+        resetState();
+        if (currentQuestionIndex < questions.length) {
+          showQuestion(questions[currentQuestionIndex]);
+          startTimer();
+          currentQuestionIndex++;
+          if (currentQuestionIndex === questions.length) {
+            nextButton.classList.add("hide");
+            submitButton.classList.remove("hide");
+          }
+        }
+      }
+
+      function showQuestion(question) {
+      const questionText = document.querySelector(".question-text");
+      const answerButtons = document.getElementById("answer-buttons");
+
+      questionText.innerText = question.question;
+
+      question.answers.forEach((answer) => {
+        const button = document.createElement("button");
+        button.classList.add("btn1");
+        button.innerText = answer.text;
+        button.addEventListener("click", () => {
+          selectAnswer(answer, question, button);
+          button.innerText += answer.correct ? ' ✔️' : ' ❌';
+        });
+        answerButtons.appendChild(button);
+      });
+    }
+
+    function startTimer() {
+      let timeLeft = 60;
+      timer = setInterval(function () {
+        timeLeft--;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
           setNextQuestion();
         }
+      }, 1000);
+    }
 
-        function setNextQuestion() {
-          resetState();
-          if (currentQuestionIndex < questions.length) {
-            showQuestion(questions[currentQuestionIndex]);
-            currentQuestionIndex++;
-            if (currentQuestionIndex === questions.length) {
-              nextButton.classList.add("hide");
-              submitButton.classList.remove("hide");
-            }
+      function resetState() {
+        clearStatusClass(document.body);
+        nextButton.classList.add("hide");
+        submitButton.classList.add("hide");
+        const answerButtons = document.getElementById("answer-buttons");
+        while (answerButtons.firstChild) {
+          answerButtons.removeChild(answerButtons.firstChild);
+        }
+      }
+
+      function selectAnswer(answer, question, button) {
+        clearInterval(timer);
+        const isCorrect = answer.correct;
+        if (isCorrect) {
+          score++;
+          button.classList.add("correct");
+        }
+        nextButton.classList.remove("hide");
+      }
+
+      function startTimer() {
+        let timeLeft = 60;
+        timer = setInterval(function () {
+          timeLeft--;
+          if (timeLeft <= 0) {
+            clearInterval(timer);
+            setNextQuestion();
           }
+        }, 1000);
+      }
+
+      function showFinalScore() {
+        clearInterval(timer);
+        questionContainer.classList.add("hide");
+        scoreContainer.classList.remove("hide");
+        rightAnswers.innerText = `Your score: ${score} out of ${questions.length}`;
+
+        // Display a message based on the score
+        let message = "";
+        if (score === questions.length) {
+          message = "Congratulations! You got all the answers right!";
+        } else if (score >= Math.floor(questions.length / 2)) {
+          message = "Well done! You did a good job!";
+        } else {
+          message = "Keep practicing. You can do better!";
         }
 
-        function showQuestion(question) {
-          const questionText = document.querySelector(".question-text");
-          const answerButtons = document.getElementById("answer-buttons");
+        const scoreMessage = document.createElement("div");
+        scoreMessage.classList.add("score-message");
+        scoreMessage.innerText = message;
+        scoreContainer.appendChild(scoreMessage);
+      }
 
-          questionText.innerText = question.question;
-
-          question.answers.forEach((answer) => {
-            const button = document.createElement("button");
-            button.classList.add("btn1");
-            button.innerText = answer.text;
-            button.addEventListener("click", () => selectAnswer(answer, question));
-            answerButtons.appendChild(button);
-          });
-        }
-
-        function resetState() {
-          clearStatusClass(document.body);
-          nextButton.classList.add("hide");
-          submitButton.classList.add("hide");
-          const answerButtons = document.getElementById("answer-buttons");
-          while (answerButtons.firstChild) {
-            answerButtons.removeChild(answerButtons.firstChild);
-          }
-        }
-
-        function selectAnswer(answer, question) {
-          const isCorrect = answer.correct;
-          if (isCorrect) {
-            score++;
-          }
-          nextButton.classList.remove("hide");
-        }
-
-        function showFinalScore() {
-          questionContainer.classList.add("hide");
-          scoreContainer.classList.remove("hide");
-          rightAnswers.innerText = `Your score: ${score} out of ${questions.length}`;
-
-          // Display a message based on the score
-          let message = "";
-          if (score === questions.length) {
-            message = "Congratulations! You got all the answers right!";
-          } else if (score >= Math.floor(questions.length / 2)) {
-            message = "Well done! You did a good job!";
-          } else {
-            message = "Keep practicing. You can do better!";
-          }
-
-          const scoreMessage = document.createElement("div");
-          scoreMessage.classList.add("score-message");
-          scoreMessage.innerText = message;
-          scoreContainer.appendChild(scoreMessage);
-        }
-
-        function clearStatusClass(element) {
-          element.classList.remove("correct");
-          element.classList.remove("wrong");
-        }
-      });
-    </script>
-  </div>
+      function clearStatusClass(element) {
+        element.classList.remove("correct");
+        element.classList.remove("wrong");
+      }
+    });
+  </script>
 </body>
+
 </html>
