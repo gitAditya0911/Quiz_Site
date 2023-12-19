@@ -296,6 +296,30 @@
           }
         }
       }
+      function checkOrientation() {
+    if (screen.orientation.type.includes("portrait")) {
+      // Display a message to the user
+      const landscapePrompt = document.createElement("div");
+      landscapePrompt.classList.add("landscape-prompt");
+      landscapePrompt.innerText = "Please rotate your device to landscape mode for the best experience.";
+      document.body.appendChild(landscapePrompt);
+    }
+  }
+
+  // Check the orientation when the page loads
+  checkOrientation();
+
+  // Listen for orientation change events
+  window.addEventListener("orientationchange", function () {
+    // Remove the landscape prompt if the orientation changes to landscape
+    if (screen.orientation.type.includes("landscape")) {
+      const landscapePrompt = document.querySelector(".landscape-prompt");
+      if (landscapePrompt) {
+        landscapePrompt.remove();
+      }
+    }
+  });
+
 
       function showQuestion(question) {
       const questionText = document.querySelector(".question-text");
